@@ -1,0 +1,48 @@
+﻿<MudButton HtmlTag="label"
+           Variant="Variant.Filled"
+           Color="Color.Primary"
+           StartIcon="@Icons.Filled.Image"
+           Disabled="@Disabled"
+           for="qrInput">
+    Upload file (max 5 MB)
+</MudButton>
+
+<InputFile id="qrInput" OnChange="@UploadQR" hidden accept="image/*;application/pdf"/>
+
+@code {
+
+    [Parameter]
+    public EventCallback<byte[]> OnQRUploaded { get; set; }
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    private async Task UploadQR(InputFileChangeEventArgs e)
+    {
+        if (!OnQRUploaded.HasDelegate)
+            return;
+
+        await OnQRUploaded.InvokeAsync(await ParseAsync(e));
+    }
+
+    private async Task<byte[]> ParseAsync(InputFileChangeEventArgs e)
+    {
+        try
+        {
+            const int maxSize = 512000;
+            if (e.File.Size > maxSize)
+                return Array.Empty<byte>(); //TODO throw...
+
+            await using MemoryStream ms = new();
+            await e.File.OpenReadStream().CopyToAsync(ms);
+            return ms.GetBuffer();
+
+            //return _Decoder.Parse(ms, e.File.Name, e.File.Size);
+            //return "HC1: something"; //TODO 
+        }
+        catch(Exception ex) //TODO narrower
+        {
+            //TODO Log
+            return Array.Empty<byte>();
+        }
+    }
+}

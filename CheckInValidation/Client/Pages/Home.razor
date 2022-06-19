@@ -1,0 +1,55 @@
+﻿@page "/"
+@using MudBlazor
+
+<MudGrid>
+    <MudItem xs="8">
+        <br/>
+        <p>Welcome to the Covid Certificate Verification Service for Travellers.</p><br/>
+        <p>In order for this site to verify your Covid Certificate for your journey, please follow the link provided by your service provider.</p><br/>
+    </MudItem>
+</MudGrid>
+
+
+@*
+<button class="btn btn-primary" @onclick="@ModalShow">Show Dialog!</button>
+
+@if (showModal)
+{
+    <div class="modal fade show" id="myModal" style="display:block" aria-modal="true" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">Confirm action</h4>
+                    <button type="button" class="close" @onclick="@ModalCancel">&times;</button>
+                </div>
+
+                <!-- Modal body -->
+                <div class="modal-body">
+                    <p>This is the modal content!</p>
+                </div>
+
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn" @onclick="@ModalCancel">No</button>
+                    <button type="button" class="btn btn-danger" @onclick=@ModalOk>Yes</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
+
+@code
+{
+    bool showModal = false;
+
+    void ModalShow() => showModal = true;
+    void ModalCancel() => showModal = false;
+    void ModalOk()
+    {
+        Console.WriteLine("Modal ok");
+        showModal = false;
+    }
+}*@

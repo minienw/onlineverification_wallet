@@ -1,0 +1,115 @@
+﻿@page "/process/{data}"
+
+@using CheckInValidation.Client;
+@using CheckInValidation.Client.Core.Helpers
+@using CheckInValidation.Client.Core
+@using Microsoft.AspNetCore.Components.WebAssembly.Hosting
+@using Newtonsoft.Json
+
+@inject VerificationWorkflow _Workflow
+@inject IWebAssemblyHostEnvironment  _HostEnvironment
+
+<br/>
+<p>You have been directed to this page by your travelling service provider.</p><br/>
+
+@if (_Workflow.InitiatingQrPayload != null)
+{
+    <MudGrid>
+        <MudItem xs="8">We have found the following request:</MudItem>
+        <MudItem xs="8">Service Provider: @_Workflow.InitiatingQrPayload.ServiceProvider</MudItem>
+        <MudItem xs="8">Protocol: @_Workflow.InitiatingQrPayload.Protocol</MudItem>
+        <MudItem xs="8">Protocol Version: @_Workflow.InitiatingQrPayload.ProtocolVersion</MudItem>
+        <MudItem xs="8">Subject: @_Workflow.InitiatingQrPayload.Subject</MudItem>
+    </MudGrid>
+
+    <MudGrid>
+        <MudItem>
+            <MudText>Please upload a file containing a DCC Health Certificate QR Code:</MudText>
+        </MudItem>
+
+        <MudCardActions>
+            <QrImageUploader Disabled="@_Workflow.ShowDccUpload" OnQRUploaded="ImageUploaded"></QrImageUploader>
+        </MudCardActions>
+    </MudGrid>
+}
+
+
+<MudGrid>
+@if (_Workflow.AfterDccValidation)
+{
+    @if (_Workflow.ShowNotify)
+    {
+        <MudItem xs="8">Verification sucessful.</MudItem>
+        <MudItem xs="8">The DCC contained the following identifying information which will be sent to the Airline:</MudItem>
+        <MudItem xs="8">Given Name: @_Workflow.DccExtract.gnt</MudItem>
+        <MudItem xs="8">Family Name: @_Workflow.DccExtract.fnt</MudItem>
+        <MudItem xs="8">Date of Birth: @_Workflow.DccExtract.dob</MudItem>
+
+
+
+        <MudItem xs="8">
+            <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.ThumbUpAlt" Style="background-color: yellowgreen; color: white; width: 200px; height: 80px;" OnClick="Notify">
+                Verification successful - Send result to @_Workflow.InitiatingQrPayload.ServiceProvider
+            </MudButton>
+        </MudItem>
+
+    }
+
+    @if (!_Workflow.ShowNotify)
+    {
+        <MudItem xs="8">Verification did not succeed for the following reasons:</MudItem>
+        <MudItem> 
+            <MudGrid>
+                <MudTable Items="@_Workflow.FailureMessages" Hover="true" Breakpoint="Breakpoint.Sm" T="FailureItem">
+                    <HeaderContent>
+                        <MudTh>Type</MudTh>
+                        <MudTh>Id</MudTh>
+                        <MudTh>Message</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd>@context.type</MudTd>
+                        <MudTd>@context.ruleIdentifier</MudTd>
+                        <MudTd>@context.customMessage</MudTd>
+                    </RowTemplate>
+                </MudTable>
+            </MudGrid>
+        </MudItem>
+    }
+}
+
+@if (!String.IsNullOrEmpty(_Workflow.WorkflowMessage))
+{
+    <MudItem xs="8">@_Workflow.WorkflowMessage</MudItem>
+}
+
+@if (_Workflow.Exiting)
+{
+    <MudItem xs="8">
+        <MudAlert Severity="Severity.Info" Class="rounded-0">
+            <p>You can close this browser window and continue with the check-in procedure at the airline webpage.</p>
+        </MudAlert>
+    </MudItem>
+}
+</MudGrid>
+
+@if (_HostEnvironment.IsDevelopment())
+{
+    <br/><br/>
+    <SimpleAudit Entries="@_Workflow.DebugMessages"></SimpleAudit>
+}
+
+@code {
+
+    [Parameter]
+    public string Data { get; set; }
+
+    protected async override void OnInitialized() => await _Workflow.OnInitializedAsync(Data);
+
+    private async Task ImageUploaded(byte[] decoded) => await _Workflow.ValidateDccAsync(decoded);
+
+
+    private async Task Notify() => await _Workflow.NotifyServiceProvider();
+    
+    private FailureItem Format(System.Security.Claims.Claim claim) => JsonConvert.DeserializeObject<FailureItem>(claim.Value);
+}
+
