@@ -1,4 +1,5 @@
-﻿using Org.BouncyCastle.Asn1.X9;
+﻿using System.Security.Cryptography;
+using Org.BouncyCastle.Asn1.X9;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Digests;
 using Org.BouncyCastle.Crypto.Encodings;
@@ -15,15 +16,15 @@ public static class Crypto
 {
     public static byte[] EncryptAesCbc(byte[] plainText, byte[] secretKey, byte[] iv)
     {
-        var cipher = CipherUtilities.GetCipher("AES/CBC/PKCS7");
+        var cipher = CipherUtilities.GetCipher("AES/CBC/PKCS5Padding");
         cipher.Init(true, new ParametersWithIV(ParameterUtilities.CreateKeyParameter("AES", secretKey), iv));
         return cipher.DoFinal(plainText);
     }
 
     public static byte[] EncryptAesGcm(byte[] plainText, byte[] secretKey, byte[] iv)
     {
-        var cipher = CipherUtilities.GetCipher("AES/GCM");
-        cipher.Init(true, new ParametersWithIV(ParameterUtilities.CreateKeyParameter("AES", secretKey), iv, iv.Length / 8, iv.Length)); //TODO I think this is wrong...
+        var cipher = CipherUtilities.GetCipher("AES/GCM/NoPadding");
+        cipher.Init(true, new ParametersWithIV(ParameterUtilities.CreateKeyParameter("AES", secretKey), iv));
         return cipher.DoFinal(plainText);
     }
 

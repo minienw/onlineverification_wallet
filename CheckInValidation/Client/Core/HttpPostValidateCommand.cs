@@ -24,9 +24,9 @@ public class HttpPostValidateCommand
     public async Task<HttpPostValidateResult> Execute(HttpPostValidateArgs args)
     {
         var secretKey = RandomNumberGenerator.GetBytes(32);
-        var encryptedDcc = Crypto.EncryptAesCbc(args.DccArtifact, secretKey, args.IV);
+        var encryptedDcc = Crypto.EncryptAesGcm(args.DccArtifact, secretKey, args.IV);
         var encryptedSecretKey = Crypto.EncryptRsaOepMfg1(secretKey, Crypto.DecodeRsaPublicKeyDerBase64(args.PublicKeyJwk.x5c[0]));
-        var digest = Crypto.Digest(encryptedDcc, args.WalletPrivateKey);
+        var digest = Crypto.Digest(args.DccArtifact, args.WalletPrivateKey);
 
         var body = new ValidationRequestBody
         {
@@ -35,7 +35,7 @@ public class HttpPostValidateCommand
             sig = Convert.ToBase64String(digest),
             sigAlg = "SHA256withECDSA",
             encKey = Convert.ToBase64String(encryptedSecretKey),
-            encScheme = "RsaOaepWithSha256AesCbcScheme",
+            encScheme = "RsaOaepWithSha256AesGcmScheme"
         };
 
         var endpoint = args.ValidatorAccessTokenObject.Payload.Aud.First();

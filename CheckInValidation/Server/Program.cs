@@ -28,7 +28,6 @@ namespace CheckInValidation
             }
 
             app.UseHttpsRedirection();
-
             app.UseBlazorFrameworkFiles();
 
             app.UseStaticFiles();
@@ -39,7 +38,7 @@ namespace CheckInValidation
 
 
             app.MapRazorPages();
-            //app.MapControllers();
+            app.MapControllers();
             app.MapFallbackToFile("index.html");
 
             app.Run();

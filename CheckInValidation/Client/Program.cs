@@ -6,7 +6,6 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using CheckInValidation.Client.Core;
 using Microsoft.Extensions.Logging;
-//using MudBlazor;
 using MudBlazor.Services;
 
 namespace CheckInValidation.Client
@@ -21,7 +20,6 @@ namespace CheckInValidation.Client
 
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
-            //builder.Services.AddMudServices();
             //builder.Services.Configure<CookiePolicyOptions>(options =>
             //{
             //    options.CheckConsentNeeded = context => true;
