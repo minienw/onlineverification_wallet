@@ -18,6 +18,15 @@ FROM build AS publish
 RUN dotnet publish "CheckInValidation.Server.csproj" -c Release -o /app/publish
 
 FROM base AS final
+RUN addgroup --group walletrunnergroup --gid 2000 \
+&& adduser \    
+    --uid 1000 \
+    --gid 2000 \
+    "walletrunner" 
+
+RUN chown walletrunner:walletrunnergroup  /app
+USER walletrunner:walletrunnergroup 
+
 WORKDIR /app
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "CheckInValidation.Server.dll"]

@@ -1,3 +1,4 @@
 ﻿REM run from the solution folder!!!
-docker tag dccparser:latest ghcr.io/minienw/dccparser:latest
-docker push ghcr.io/minienw/dccparser:latest
+REM docker build . -f CheckInValidation\Server\Dockerfile -t checkinvalidation:latest
+docker tag checkinvalidation:latest ghcr.io/minienw/checkinvalidation:latest
+docker push ghcr.io/minienw/checkinvalidation:latest
